@@ -10,7 +10,6 @@
 #### Workspace setup ####
 library(tidyverse)
 
-
 #### Simulate data ####
 set.seed(200)
 
@@ -31,7 +30,8 @@ data <-
       ),
       origin = "1970-01-01"
     ),
-    number_of_sales = rpois(n = number_of_dates, lambda = 15)
+    number_of_sales = rpois(n = number_of_dates, lambda = 15),
+    number_of_redemptions = rpois(n = number_of_dates, lambda = 20)
   )
 
 # Write_csv
