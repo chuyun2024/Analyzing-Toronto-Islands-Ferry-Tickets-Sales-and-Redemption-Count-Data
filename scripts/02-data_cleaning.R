@@ -1,44 +1,29 @@
 #### Preamble ####
-# Purpose: Cleans the raw plane data recorded by two observers..... [...UPDATE THIS...]
-# Author: Rohan Alexander [...UPDATE THIS...]
-# Date: 6 April 2023 [...UPDATE THIS...]
-# Contact: rohan.alexander@utoronto.ca [...UPDATE THIS...]
-# License: MIT
-# Pre-requisites: [...UPDATE THIS...]
-# Any other information needed? [...UPDATE THIS...]
+# Purpose: Cleans the raw sales data into analysis
+# Author: Yun Chu
+# Date: 21 September 2024
+# Contact: yun.chu@mail.utoronto.ca
+# License: 
+# Pre-requisites: Need to download the data
+# Any other information needed? None
 
 #### Workspace setup ####
 library(tidyverse)
+library(lubridate)
+library(dplyr)
 
 #### Clean data ####
-raw_data <- read_csv("inputs/data/plane_data.csv")
+raw_data <- read_csv("data/raw_data/unedited_sales_data.csv")
 
-cleaned_data <-
+cleaned_data <- 
   raw_data |>
   janitor::clean_names() |>
-  select(wing_width_mm, wing_length_mm, flying_time_sec_first_timer) |>
-  filter(wing_width_mm != "caw") |>
-  mutate(
-    flying_time_sec_first_timer = if_else(flying_time_sec_first_timer == "1,35",
-                                   "1.35",
-                                   flying_time_sec_first_timer)
-  ) |>
-  mutate(wing_width_mm = if_else(wing_width_mm == "490",
-                                 "49",
-                                 wing_width_mm)) |>
-  mutate(wing_width_mm = if_else(wing_width_mm == "6",
-                                 "60",
-                                 wing_width_mm)) |>
-  mutate(
-    wing_width_mm = as.numeric(wing_width_mm),
-    wing_length_mm = as.numeric(wing_length_mm),
-    flying_time_sec_first_timer = as.numeric(flying_time_sec_first_timer)
-  ) |>
-  rename(flying_time = flying_time_sec_first_timer,
-         width = wing_width_mm,
-         length = wing_length_mm
-         ) |> 
-  tidyr::drop_na()
+  mutate(formatted_date = format(ymd_hms(timestamp), "%Y-%m-%d")) |>
+  group_by(formatted_date) |>
+  summarize(
+    daily_sales_count = sum(sales_count, na.rm = TRUE),
+    daily_redemption_count = sum(redemption_count, na.rm=TRUE)
+  )
 
 #### Save data ####
 write_csv(cleaned_data, "outputs/data/analysis_data.csv")
