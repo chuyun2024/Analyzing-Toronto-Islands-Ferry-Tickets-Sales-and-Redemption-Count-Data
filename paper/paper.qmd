@@ -1,14 +1,14 @@
 ---
-title: "My title"
-subtitle: "My subtitle if needed"
+title: "Analyzing Toronto Islands Ferry Tickets Sales and Redemption Count Data"
+subtitle: ""
 author: 
-  - First author
-  - Another author
-thanks: "Code and data are available at: LINK."
-date: today
+  - Yun Chu
+thanks: ""
+date: 23 September 2024
 date-format: long
 abstract: "First sentence. Second sentence. Third sentence. Fourth sentence."
 format: pdf
+toc: true
 number-sections: true
 bibliography: references.bib
 ---
@@ -17,132 +17,219 @@ bibliography: references.bib
 #| include: false
 #| warning: false
 #| message: false
-
 library(tidyverse)
-library(palmerpenguins)
+library(knitr)
+library(scales)
+library(dplyr)
 ```
-
 
 # Introduction
 
-You can and should cross-reference sections and sub-sections. We use @citeR and @rohan.
+Ferries to Toronto Island Park is a service that operates all year round. Ferries carry passenger from Jack Layton Ferry Terminal to Center Island, Hanlan's Point and Ward's Island or from the three islands to the terminal. 
+They are popular places to visit for tourists and people who live in Toronto. Most people take the ferries to and from Toronto Islands while others take water taxis. By analyzing the sales and redemption count data of the ferry to Toronto Islands, we can better understand visitor trends to help with maximizing resource allocation and analyze revenue data.
 
-The remainder of this paper is structured as follows. @sec-data....
+Through identifying peak seasons for ferry usage, it would help understand at what times are the islands most popular. This would inform details about resource allocation and operational planning information for governments. For example, the information could be used to design the departure and returning schedule of the ferry and the number of staff on duty in each season. By examining sales data over time, revenue trends can be identified and thus help assess the financial health of the ferry service and guide pricing strategies.
 
+This paper reveals that the sales and redemption data are highly correlated and is highly likely to have a linear relationship. It also finds that in summer months, the number of redemption is much higher compared with winter months. Moreover, the 95% of redemption is below 16,076 per day.
 
+The remainder of this paper is structured as follows. @sec-data discusses about the features of raw data and the cleaned data, as well as some summary of the cleaned data. @sec-result discusses about the details of investigating the relationship between Sales and Redemption Data through graphs, linear regression and correlation. Besides, the section also presents and analyses the distribution of the redemption count data based on frequency and month.
+@sec-discussion elaborates further on the implication and application of the analysis in @sec-result. It also discusses about the weakness of the analysis and the ways to improve.
 
 # Data {#sec-data}
 
-Some of our data is of penguins (@fig-bills), from @palmerpenguins.
+## Raw Data
 
-```{r}
-#| label: fig-bills
-#| fig-cap: Bills of penguins
+The data used in this paper is taken from Toronto Open Data and is read into the paper using the opendatatoronto library (Gelfand 2022). The raw data contains the timestamp data per 15 minutes and the sales and redemption count data for each 15-minute time (Toronto 2024).The it contains data from July 11st, 2023 to September 20, 2024. The data is updated hourly.
+
+The dataset is downloaded, cleaned and analysed using R (R Core Team 2023). The following packages are also utilized:
+
+-   tidyverse (Wickham 2021)
+-   lubridate (Grolemund & Wickham, 2011)
+-   dplyr (Wickham et al. 2023)
+-   ggplot2 (Wickham 2016)
+-   knitr (Xie, 2015)
+-   scales (Wickham, 2018)
+
+
+## Cleaned Data
+
+A sample of the cleaned data (@tbl-cleaned_data) and a line plot (@fig-Sales_and_Redemption_vs_Date) showcasing every sales and redemption count data by date are shown below.
+
+```{r, warning=FALSE}
+#| label: tbl-cleaned_data
 #| echo: false
+data <- read_csv("../data/analysis_data/cleaned_data.csv", show_col_types = FALSE)
+data2 <- head(data)
 
-ggplot(penguins, aes(x = island, fill = species)) +
-  geom_bar(alpha = 0.8) +
-  scale_fill_manual(values = c("darkorange","purple","cyan4"),
-                    guide = "none") +
-  theme_minimal() +
-  facet_wrap(~species, ncol = 1) +
-  coord_flip()
+kable(data2, col.names = c('Date', 'Sales', 'Redemption'), align = "ccc", 
+      caption = "Sample of Cleaned Sales and Redemption Data")
 ```
 
-Talk more about it.
+```{r, fig.width = 9, fig.height = 5}
+#| label: fig-Sales_and_Redemption_vs_Date
+#| fig-cap: line plot of sales and redemption data with respect to time
+#| echo: false
+ggplot(data, aes(x = formatted_date)) +
+  geom_line(aes(y = daily_sales_count, color = "Sales"), linewidth = 1, alpha = 0.7) +     
+  geom_line(aes(y = daily_redemption_count, color = "Redemption"), linewidth = 1, alpha = 0.7) +
+  labs(title = "Sales and Redemption Over Time",                
+       x = "Date",                                          
+       y = "Count") +                               
+  scale_color_manual(name = "Legend", values = c("Sales" = "goldenrod1", "Redemption" = "plum1")) + 
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
+```
 
-And also planes (@fig-planes). (You can change the height and width, but don't worry about doing that until you have finished every other aspect of the paper - Quarto will try to make it look nice and the defaults usually work well once you have enough text.)
+From the line graph, we can see that the sales and redemption data is highly overlapped and that the values are much bigger in summer compared with winter.
 
+## Summary of Data
+
+To have a better understanding of the data, the mean sales and redemption counts are calculated in @tbl-mean_sales_and_redemption.
 ```{r}
-#| label: fig-planes
-#| fig-cap: Relationship between wing length and width
+#| label: tbl-mean_sales_and_redemption
 #| echo: false
 #| warning: false
 #| message: false
-
-analysis_data <- read_csv(here::here("data/analysis_data/analysis_data.csv"))
-
-analysis_data |> 
-  ggplot(aes(x = width, y = length)) +
-  geom_point(alpha = 0.8) +
-  theme_minimal() +
-  labs(x = "Wing width (mm)",
-       y = "Wing length (mm)")
+data_means <- 
+  data |> 
+  summarise( mean_sales = mean(daily_sales_count),
+             mean_redemption = mean(daily_redemption_count))
+kable(data_means, col.names = c('Mean Sales','Mean Redemption'), align = 'cc', caption = 'Mean Sales and Redemption Count')
 ```
-
-Talk way more about it. 
-
-
-
-# Model
-
-The goal of our modelling strategy is twofold. Firstly,...
-
-Here we briefly describe the Bayesian analysis model used to investigate... Background details and diagnostics are included in [Appendix -@sec-model-details].
-
-## Model set-up
-
-Define $y_i$ as the number of seconds that the plane remained aloft. Then $\beta_i$ is the wing width and $\gamma_i$ is the wing length, both measured in millimeters.  
-
-\begin{align} 
-y_i|\mu_i, \sigma &\sim \mbox{Normal}(\mu_i, \sigma) \\
-\mu_i &= \alpha + \beta_i + \gamma_i\\
-\alpha &\sim \mbox{Normal}(0, 2.5) \\
-\beta &\sim \mbox{Normal}(0, 2.5) \\
-\gamma &\sim \mbox{Normal}(0, 2.5) \\
-\sigma &\sim \mbox{Exponential}(1)
-\end{align}
-
-We run the model in R [@citeR] using the `rstanarm` package of @rstanarm. We use the default priors from `rstanarm`.
-
-
-### Model justification
-
-We expect a positive relationship between the size of the wings and time spent aloft. In particular...
-
-We can use maths by including latex between dollar signs, for instance $\theta$.
-
-
-# Results
-
-Our results are summarized in @tbl-modelresults.
+The mean sales is very close to mean redemption. From both @fig-Sales_and_Redemption_vs_Date and @tbl-mean_sales_and_redemption, the sales and redemption data look very alike. The analysis of the relationship between sales and redemption is done in the next section.
 
 ```{r}
+#| label: Sorted Data
+#| fig-cap: Cleaned data sorted by sales and redemption repectively
 #| echo: false
-#| eval: true
 #| warning: false
 #| message: false
+#| include: false
+sorted_sales <- data %>%
+  arrange(desc(daily_sales_count))
 
-library(rstanarm)
+selected_sales <- sorted_sales %>%
+  select(formatted_date, daily_sales_count, daily_redemption_count) 
 
-first_model <-
-  readRDS(file = here::here("models/first_model.rds"))
+plot1 <- head(selected_sales, n=10) %>%
+  kable(col.names = c('Date', 'Sales', 'Redemption'), 
+        align = "ccc", 
+        caption = "Cleaned Data Sorted by Sales")
+
+sorted_redemption <- data %>%
+  arrange(desc(daily_redemption_count))
+
+selected_redemption <- sorted_redemption %>%
+  select(formatted_date, daily_sales_count, daily_redemption_count) 
+
+plot2 <- head(selected_redemption, n= 10) %>%
+  kable(col.names = c('Date', 'Sales', 'Redemption'), 
+        align = "ccc", 
+        caption = "Cleaned Data Sorted by Redemption")
+plot1
+plot2
+
 ```
 
-```{r}
-#| echo: false
-#| eval: true
-#| label: tbl-modelresults
-#| tbl-cap: "Explanatory models of flight time based on wing width and wing length"
-#| warning: false
+# Result{#sec-result}
 
-modelsummary::modelsummary(
-  list(
-    "First model" = first_model
-  ),
-  statistic = "mad",
-  fmt = 2
+
+## Investigating the Relationship between the Sales and Redemption Data
+
+To investigate the relationship between sales and redemption data directly, we first plot @fig-Sales_vs_Redemption where it describe the relationship between the variables visually.
+
+
+```{r,fig.width = 6, fig.height = 3}
+#| label: fig-Sales_vs_Redemption
+#| fig-cap: Relationship betwwen Sales and Redemption
+#| echo: false
+#| warning: false
+#| message: false
+library(ggplot2)
+ggplot(data, aes(x = daily_sales_count, y = daily_redemption_count)) +
+  geom_point() +
+  labs(title = "Scatter Plot of Sales vs Redemption",
+       x = "Ticket Sales Count",
+       y = "Ticket Redemption Count")
+
+```
+
+
+It is obvious to tell that they have a linear relationship. To further investigate, we do a linear regression with redemption count as the response variable and sales count as the predictor variable. As @tbl-linear_regression_and_correlation_result shows, the R-squared statistic is 0.9882 and the correlation between redemption count and sales count is 0.994. These values indicates that the redemption count and sales count are indeed highly correlated. 
+
+In this paper we'll be mainly focusing on analyzing the redemption count data since it is the direct reflection of the visitor data and using it to analyze revenue is accurate enough since the two variables are higly overlapped and correlated.
+
+
+```{r}
+#| label: tbl-linear_regression_and_correlation_result
+#| echo: false
+#| warning: false
+#| message: false
+model <- lm(daily_redemption_count ~ daily_sales_count, data = data)
+r_squared <- summary(model)$r.squared
+corr_stat <- cor(data$daily_sales_count, data$daily_redemption_count)
+summary_table <- data.frame(
+  statistic = c("R-Squared", "Correlation"),
+  value = c(r_squared, corr_stat)
 )
+kable(summary_table, col.names = c("Statistics", "Value"), align = 'cc', caption = "R-squared and Correlation Statistic")
 ```
 
 
+## Investigating the Frequency of Redemption Count Data
+
+@fig-Daily_Redemption_Histogram shows that for most of the days, the redemption count is below 10,000 times, while the rest of days has redemption count up to 20234 times in one day. For our purpose of using the information to help with resource allocation, monthly data would be sufficient enough so that we can create monthly schedule for staff. Creating daily schedules would be not as feasible and efficient as monthly schedules.
+
+```{r}
+#| label: fig-Daily_Redemption_Histogram
+#| fig-cap: Histogram of Daily Redemption count data
+#| echo: false
+#| warning: false
+#| message: false
+percentile_95 <- quantile(data$daily_redemption_count, 0.95)
+
+ggplot(data, aes(x = daily_redemption_count)) +
+  geom_histogram(binwidth = 300, fill = "lightskyblue", color = "steelblue1") +
+  labs(title = "Histogram of Daily Redemption Counts",
+       x = "Daily Redemption Count",
+       y = "Frequency") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  annotate("text", x = percentile_95, y = 30, label = paste("95th Percentile:", round(percentile_95, 2)), 
+           color = "mediumpurple", vjust = -0.5) +
+  geom_vline(xintercept = percentile_95, color = "mediumpurple", linetype = "dashed", size = 1)
+```
+
+@fig-Redemption_Over_Month showcases the redemption count over each month. The dividing line in each bar is to indicate each day's redemption count and show how they add up together. It is evident that in Winter months, the redemption counts are very small, while in summer months, the redemption counts are very high. In August 2023, the redemption count is almost 350,000.
+
+## Investigating the Monthly Redemption Data
+```{r}
+#| label: fig-Redemption_Over_Month
+#| fig-cap: Redemption Count of Each Month
+#| echo: false
+#| warning: false
+#| message: false
+data <- data %>%
+  mutate(year_month = format(formatted_date, "%Y-%m"))
+
+ggplot(data, aes(x = year_month, y = daily_redemption_count)) +
+  geom_bar(stat = "identity", fill = "grey93", color = "lightskyblue") +
+  labs(title = "Redemption Over Month",                
+       x = "Month",                                          
+       y = "Redemption Count") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+         plot.title = element_text(hjust = 0.5)) +
+  scale_y_continuous(labels = comma)
+```
+
+From July to September 2023 and May to September 2024, the monthly redemption count exceeds 100,000 each month. From October 2023 to April 2024, the redemption count is less than 100,000 each month. It would be reasonable to design two schedules for the ferries and assign different number of staff to be on duty based on this threshold.
 
 
-# Discussion
+# Discussion{#sec-discussion}
+
 
 ## First discussion point {#sec-first-point}
 
-If my paper were 10 pages, then should be be at least 2.5 pages. The discussion is a chance to show off what you know and what you learnt from all this. 
+If my paper were 10 pages, then should be be at least 2.5 pages. The discussion is a chance to show off what you know and what you learnt from all this.
 
 ## Second discussion point
 
@@ -156,66 +243,11 @@ Weaknesses and next steps should also be included.
 
 \appendix
 
-# Appendix {-}
-
+# Appendix {.unnumbered}
 
 # Additional data details
-
-# Model details {#sec-model-details}
-
-## Posterior predictive check
-
-In @fig-ppcheckandposteriorvsprior-1 we implement a posterior predictive check. This shows...
-
-In @fig-ppcheckandposteriorvsprior-2 we compare the posterior with the prior. This shows... 
-
-```{r}
-#| eval: true
-#| echo: false
-#| message: false
-#| warning: false
-#| label: fig-ppcheckandposteriorvsprior
-#| layout-ncol: 2
-#| fig-cap: "Examining how the model fits, and is affected by, the data"
-#| fig-subcap: ["Posterior prediction check", "Comparing the posterior with the prior"]
-
-pp_check(first_model) +
-  theme_classic() +
-  theme(legend.position = "bottom")
-
-posterior_vs_prior(first_model) +
-  theme_minimal() +
-  scale_color_brewer(palette = "Set1") +
-  theme(legend.position = "bottom") +
-  coord_flip()
-```
-
-## Diagnostics
-
-@fig-stanareyouokay-1 is a trace plot. It shows... This suggests...
-
-@fig-stanareyouokay-2 is a Rhat plot. It shows... This suggests...
-
-```{r}
-#| echo: false
-#| eval: true
-#| message: false
-#| warning: false
-#| label: fig-stanareyouokay
-#| fig-cap: "Checking the convergence of the MCMC algorithm"
-#| fig-subcap: ["Trace plot", "Rhat plot"]
-#| layout-ncol: 2
-
-plot(first_model, "trace")
-
-plot(first_model, "rhat")
-```
-
 
 
 \newpage
 
-
 # References
-
-
