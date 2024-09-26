@@ -25,5 +25,7 @@ cleaned_data <-
     daily_redemption_count = sum(redemption_count, na.rm=TRUE)
   )
 
+#### add test for the actual data
+
 #### Save data ####
 write_csv(cleaned_data, "data/analysis_data/cleaned_data.csv")

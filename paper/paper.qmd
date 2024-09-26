@@ -6,7 +6,7 @@ author:
 thanks: ""
 date: 23 September 2024
 date-format: long
-abstract: "First sentence. Second sentence. Third sentence. Fourth sentence."
+abstract: "The paper firstly discussed the background of the dataset, then presented and analyzed the cleaned dataset. In the result section, the relationship between the sales and redemption data, the distribution of redemption count, and the trend of redemption count with respect to time is analyzed. The discussion section comes up with some suggestions to Toronto Islands ferries based on the findings and discuss the limilation of the analysis."
 format: pdf
 toc: true
 number-sections: true
@@ -25,7 +25,8 @@ library(dplyr)
 
 # Introduction
 
-Ferries to Toronto Island Park is a service that operates all year round. Ferries carry passenger from Jack Layton Ferry Terminal to Center Island, Hanlan's Point and Ward's Island or from the three islands to the terminal. 
+Ferries to Toronto Island Park is a service that operates all year round. Ferries carry passenger from Jack Layton Ferry Terminal to Center Island, Hanlan's Point and Ward's Island or from the three islands to the terminal (@toronto_ferry_website).
+
 They are popular places to visit for tourists and people who live in Toronto. Most people take the ferries to and from Toronto Islands while others take water taxis. By analyzing the sales and redemption count data of the ferry to Toronto Islands, we can better understand visitor trends to help with maximizing resource allocation and analyze revenue data.
 
 Through identifying peak seasons for ferry usage, it would help understand at what times are the islands most popular. This would inform details about resource allocation and operational planning information for governments. For example, the information could be used to design the departure and returning schedule of the ferry and the number of staff on duty in each season. By examining sales data over time, revenue trends can be identified and thus help assess the financial health of the ferry service and guide pricing strategies.
@@ -39,16 +40,15 @@ The remainder of this paper is structured as follows. @sec-data discusses about 
 
 ## Raw Data
 
-The data used in this paper is taken from Toronto Open Data and is read into the paper using the opendatatoronto library (Gelfand 2022). The raw data contains the timestamp data per 15 minutes and the sales and redemption count data for each 15-minute time (Toronto 2024).The it contains data from July 11st, 2023 to September 20, 2024. The data is updated hourly.
+The data used in this paper is taken from Toronto Open Data and is read into the paper using the opendatatoronto library (Gelfand 2022). The raw data contains the timestamp data per 15 minutes and the sales and redemption count data for each 15-minute time collected from online and POS-kiosk sales(@toronto_ferry_tickets).The it contains data from July 11st, 2023 to September 20, 2024. The data is updated hourly.
 
-The dataset is downloaded, cleaned and analysed using R (R Core Team 2023). The following packages are also utilized:
+The dataset is downloaded, cleaned and analysed using R (@citeR). The following packages are also utilized:
 
--   tidyverse (Wickham 2021)
--   lubridate (Grolemund & Wickham, 2011)
--   dplyr (Wickham et al. 2023)
--   ggplot2 (Wickham 2016)
--   knitr (Xie, 2015)
--   scales (Wickham, 2018)
+-   tidyverse (@tidyverse)
+-   lubridate (@lubridate)
+-   dplyr (@dplyr)
+-   knitr (@knitr)
+-   scales (@scales)
 
 
 ## Cleaned Data
@@ -134,7 +134,7 @@ plot2
 # Result{#sec-result}
 
 
-## Investigating the Relationship between the Sales and Redemption Data
+## Investigating the Relationship between the Sales and Redemption Data{#sec-result1}
 
 To investigate the relationship between sales and redemption data directly, we first plot @fig-Sales_vs_Redemption where it describe the relationship between the variables visually.
 
@@ -227,17 +227,23 @@ From July to September 2023 and May to September 2024, the monthly redemption co
 # Discussion{#sec-discussion}
 
 
-## First discussion point {#sec-first-point}
+## Suggestions to adjusting price based on season {#sec-first-point}
 
-If my paper were 10 pages, then should be be at least 2.5 pages. The discussion is a chance to show off what you know and what you learnt from all this.
+From the high correlation and linear relationship between the sales and redemption data, one possible reason might be that the ferry price is flat for all years. If the price is set to be lower in off-peak season, that might help increase revenue in winter while the loss of revenue in summer might not be high.
 
-## Second discussion point
 
-## Third discussion point
+## Measures government can take on to cope with high-volume season
+
+Based on @fig-Daily_Redemption_Histogram, one measure that Toronto Islands ferries could adapt is that during the peak seasons, integrate the staff schedules to be prepared for large visitor volumes. For example, having some janitors to be on-call in case there is a large amount of people using the ferries service and there's not enough staff to clean the garbage. This also leads to the next discussion point, which is the on-call schedule should be set based on peak season and off-peak season. If it's winter months, preparing the number of staff to cope with more than 20,000 visitors per day is just waste of resources.
+
+## Monthly Schedules based on historical data
+
+from @fig-Redemption_Over_Month, a noticeable difference is the height of the bars between May-September and the rest of the months in a year. Right now, the Toronto Island ferries, already adapt different schedules for summer and winter months to allocate resources efficiently. Taking a closer look at the graph, July and August have much higher redemption count compared with the rest of summer months. Further splitting the schedules might be helpful to better meet visitors' need and avoid wasting resouces.
+
 
 ## Weaknesses and next steps
 
-Weaknesses and next steps should also be included.
+By examining the linear relationship of redemption and sales data in @sec-result1, the analysis is done using redemption data for simplicity and the representation of the actual visitor volume of the ferries. If we're want to get a better sense of anything related to revenue, analysis with the sales data would be more accurate.
 
 \newpage
 
