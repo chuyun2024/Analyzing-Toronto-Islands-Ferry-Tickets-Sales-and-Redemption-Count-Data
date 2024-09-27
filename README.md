@@ -2,8 +2,7 @@
 
 ## Overview
 
-This repo provides the codes needed to produce the paper that analyzes the Toronto Islands ferry tickets sales and redemption count data.
-
+This paper presents a comprehensive analysis of the Toronto Islands ferry ticket sales and redemption dataset. The analysis begins with an overview of the dataset, followed by an examination of the cleaned data. In the results section, we explore the relationship between sales and redemption data, the distribution of redemption counts, and the monthly trends in redemption activity. Based on the findings, we offer recommendations to optimize ferry operations, focusing on pricing strategies, staffing allocations, and departure schedules. The paper concludes by discussing the limitations of the analysis and identifying potential areas for future improvement.
 
 ## File Structure
 

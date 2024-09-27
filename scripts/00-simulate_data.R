@@ -20,7 +20,7 @@ end_date <- as.Date("2024-08-31")
 # Set the number of Random dates
 number_of_dates <- 200
 
-#generate random dates from Poisson Distribution
+# generate random dates from Poisson Distribution
 data <-
   tibble(
     dates = as.Date(

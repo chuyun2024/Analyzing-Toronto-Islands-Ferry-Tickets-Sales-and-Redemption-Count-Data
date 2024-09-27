@@ -6,7 +6,7 @@ author:
 thanks: "code and data supporting this analaysis can be found here: https://github.com/chuyun2024/Analyzing-Toronto-Islands-Ferry-Tickets-Sales-and-Redemption-Count-Data"
 date: 26 September 2024
 date-format: long
-abstract: "This paper presents a comprehensive analysis of the Toronto Islands ferry ticket sales and redemption dataset. The analysis begins with an overview of the dataset, followed by an examination of the cleaned data. In the results section, we explore the relationship between sales and redemption data, the distribution of redemption counts, and the monthly trends in redemption activity. Based on the findings, we offer recommendations to optimize ferry operations, focusing on pricing strategies, staffing allocations, and departure schedules. The paper concludes by discussing the limitations of the analysis and identifying potential areas for future improvement."
+abstract: "This paper presents a comprehensive analysis of the Toronto Islands ferry ticket sales and redemption dataset. The analysis begins with an overview of the dataset, followed by an examination of the cleaned data. In the results section, the relationship between sales and redemption data, the distribution of redemption counts, and the monthly trends in redemption activity are explored. Based on the findings, recommendations to optimize ferry operations, focusing on pricing strategies, staffing allocations, and departure schedules are offered. The paper concludes by discussing the limitations of the analysis and identifying potential areas for future improvement."
 format: pdf
 toc: true
 number-sections: true
@@ -27,19 +27,19 @@ library(ggplot2)
 
 # Introduction
 
-Ferries to Toronto Island Park operate year-round, transporting passengers between the Jack Layton Ferry Terminal and Center Island, Hanlan's Point, and Ward's Island, or in the reverse direction from the islands to the terminal. Currently, the ferries operate on four different schedules, each corresponding to one of the four seasons of the year [@toronto_ferry_website].
+Ferries to Toronto Island Park operate year-round, transporting passengers between the Jack Layton Ferry Terminal and Center Island, Hanlan's Point, and Ward's Island, or in the reverse direction from the islands to the terminal. Round-trip tickets are priced at 9.11 Canadian Dollars for adults, with discounted rates available for seniors, youth, juniors, and infants. Currently, the ferries operate on four different schedules, each corresponding to one of the four seasons of the year [@toronto_ferry_website].
 
-These islands are popular destinations for both tourists and residents of Toronto. By analyzing the sales and redemption count data of the ferry service, we can gain insights into visitor trends, helping to optimize resource allocation and revenue management.Identifying peak ferry usage seasons enables a better understanding of when the islands are most popular. This information can be instrumental for governments in resource allocation and operational planning, such as adjusting ferry schedules and staffing levels throughout the year. Additionally, analyzing sales data over time helps uncover revenue trends, providing valuable insights into the financial health of the ferry service and informing pricing strategies.
+These islands are popular destinations for both tourists and residents of Toronto. By analyzing the sales and redemption count data of the ferry service, we can gain insights into visitor trends, helping to optimize resource allocation and revenue management. Identifying peak ferry usage seasons enables a better understanding of when the islands are most popular. This information can be instrumental for governments in resource allocation and operational planning, such as adjusting ferry schedules and staffing levels throughout the year. Additionally, analyzing sales data over time helps uncover revenue trends, providing valuable insights into the financial health of the ferry service and informing pricing strategies.
 
 This paper reveals a strong correlation between sales and redemption data, suggesting a likely linear relationship. It also finds that during the summer months, redemptions are significantly higher compared to winter months. Moreover, 95% of daily redemptions falls below 16,076 @fig-Daily_Redemption_Histogram. 
 
-The remainder of this paper is structured as follows. @sec-data discusses the features of the raw and cleaned data, along with a summary of the cleaned data. @sec-result investigates the relationship between sales and redemption data using graphs, linear regression, and correlation analysis. It also explores the distribution of redemption counts by frequency and counts. @sec-discussion further elaborates on the implications and applications of the findings from @sec-result, addresses the limitations of the analysis, and suggests potential improvements.
+The remainder of this paper is structured as follows. @sec-data1 - @sec-data3 discusses the features of the raw and cleaned data, along with a summary of the cleaned data. @sec-result1 - @sec-result3 investigates the relationship between sales and redemption data using graphs, linear regression, and correlation analysis. It also explores the distribution of redemption counts by frequency and counts. @sec-dis1 - @sec-dis3 further elaborates on the implications and applications of the findings from @sec-result1 - @sec-result3, addresses the limitations of the analysis, and suggests potential improvements.
 
 # Data {#sec-data}
 
-## Raw Data & Measurement
+## Raw Data & Measurement{#sec-data1}
 
-The data used in this paper is sourced from the Toronto Open Data portal and was imported using the opendatatoronto library (Gelfand, 2022). The raw dataset contains sales and redemption count data, recorded at 15-minute intervals, collected from both online and POS-kiosk sales. The dataset contains four variables: id, timestamp, sales count and redemption count. The id variable is a sequential number that records the order of the data entries. The dataset spans from July 11, 2023, to September 20, 2024, at the time of download [@toronto_ferry_tickets]. Similar datasets were not found online.
+The data used in this paper is sourced from the Toronto Open Data portal and was imported using the opendatatoronto library (Gelfand, 2022). The raw dataset contains sales and redemption count data, recorded at 15-minute intervals, collected from both online and POS-kiosk sales. The dataset comprises four variables: ID, timestamp, sales count, and redemption count. The ID variable is a sequential number that records the order of the data entries. Both sales and redemption counts are measured per person, with the redemption count indicating how many individuals successfully redeemed their tickets and boarded the ferries. The sales count represents the total number of tickets sold at kiosks and online. The dataset spans from July 11, 2023, to September 20, 2024, at the time of download [@toronto_ferry_tickets]. Similar datasets were not found online.
 
 The data was downloaded, cleaned, and analyzed using R [@citeR]. Several R packages were utilized throughout the analysis:
 
@@ -48,8 +48,12 @@ The data was downloaded, cleaned, and analyzed using R [@citeR]. Several R packa
 - dplyr [@dplyr]
 - knitr [@knitr]
 - scales [@scales]
+- kableExtra [@kableExtra]
 
-## Cleaned Data
+
+## Cleaned Data{#sec-data2}
+
+The data has been cleaned by removing the hour and minute portions from the Timestamp variable and eliminating the ID variable. Additionally, the sales and redemption count data have been recalculated based on the date rather than the previous 15-minute time intervals.
 
 A sample of the cleaned data (@tbl-cleaned_data) and a line plot (@fig-Sales_and_Redemption_vs_Date) illustrating the sales and redemption counts over time are shown below.
 
@@ -77,7 +81,7 @@ kable(data2,
 )
 ```
 
-```{r, fig.width = 8, fig.height = 5}
+```{r, fig.width = 7, fig.height = 4}
 #| label: fig-Sales_and_Redemption_vs_Date
 #| fig-cap: line plot of sales and redemption data with respect to time
 #| echo: false
@@ -102,7 +106,7 @@ ggplot(data, aes(x = formatted_date)) + # Define the data and aesthetic mappings
 The sales and redemption data largely overlap, with significantly higher values in the summer compared to the winter months (@fig-Sales_and_Redemption_vs_Date).
 
 
-## Summary Statistic
+## Summary Statistic{#sec-data3}
 
 To have a better understanding of the data, the minimum, maximum, mean and standard deviation of sales and redemption counts are calculated in @tbl-mean_sales_and_redemption. 
 
@@ -111,6 +115,8 @@ To have a better understanding of the data, the minimum, maximum, mean and stand
 #| echo: false
 #| warning: false
 #| message: false
+#| fig.show: hold
+
 # Calculate summary statistics
 summary_statistic <- data |>
   summarise(
@@ -137,21 +143,24 @@ rownames(summary_table) <- c("Sales", "Redemption")
 
 # Display the summary table with row and column headings
 kable(summary_table,
-  format = "latex", row.names = TRUE, col.names = c("Min", "Max", "Mean", "Standard Deviation"),
+  format = "latex",
+  row.names = TRUE,
+  col.names = c("Min", "Max", "Mean", "Standard Deviation"),
   caption = "Summary Statistics for Sales and Redemption Count",
   align = "ccccc"
 ) |>
   kable_styling(full_width = FALSE, position = "left")
+
+# Note about the table: Setting the format = "latex" resulting that the table does not show under the code chunk, but when rendering, the table shows up fine. If you want to see the table under the code, change format = "html" and it will show up.
 ```
 
-The summary statistics for sales and redemption counts, presented in Table @tbl-mean_sales_and_redemption, reveal notable similarities across all metrics.
+The summary statistics for sales and redemption counts, presented in @tbl-mean_sales_and_redemption, reveal notable similarities across all metrics.
 
 Given these similarities, it is worthwhile to investigate the relationship between sales and redemption further. This analysis will be explored in @sec-result1.
 
-# Result{#sec-result}
 
 
-## Investigating the Relationship between the Sales and Redemption Data{#sec-result1}
+## Analyais - Investigating the Relationship between the Sales and Redemption Data{#sec-result1}
 
 To investigate the relationship between sales and redemption data, we first create a plot (@fig-Sales_vs_Redemption) that visually describes the relationship between these variables.
 
@@ -166,7 +175,7 @@ To investigate the relationship between sales and redemption data, we first crea
 ggplot(data, aes(x = daily_sales_count, y = daily_redemption_count)) + # Set the data and aesthetic mappings; daily sales on the x-axis and daily redemption on the y-axis
   geom_point(alpha = 0.5, color = "#008080") + # Add points to the plot to represent each observation
   labs(
-    title = "Scatter Plot of Sales vs Redemption", # Add a title to the plot
+    title = "Scatter Plot of Sales vs Redemption of Toronto's Ferries", # Add a title to the plot
     x = "Ticket Sales Count", # Label for the x-axis
     y = "Ticket Redemption Count"
   ) + # Label for the y-axis
@@ -174,7 +183,7 @@ ggplot(data, aes(x = daily_sales_count, y = daily_redemption_count)) + # Set the
 ```
 
 
-A linear relationship can be seen from the scatter plot. To further investigate this relationship, we performed a linear regression with redemption count as the response variable and sales count as the predictor variable. As shown in Table @tbl-linear_regression_and_correlation_result, the R-squared statistic is 0.9882, and the correlation coefficient between redemption count and sales count is 0.994. These values indicate a strong linear correlation between the two variables.
+A linear relationship can be seen from the scatter plot. To further investigate this relationship, a linear regression with redemption count as the response variable and sales count as the predictor variable is performed. As shown in @tbl-linear_regression_and_correlation_result, the R-squared statistic is 0.9882, and the correlation coefficient between redemption count and sales count is 0.9941. These values indicate a strong linear correlation between the two variables.
 
 In this paper, we will primarily focus on analyzing the redemption count data, as it directly reflects visitor data. Utilizing redemption counts to analyze revenue is sufficiently accurate due to the high overlap and correlation between the two variables.
 
@@ -205,11 +214,11 @@ kable(summary_table, col.names = c("Statistics", "Value"), align = "cc", caption
 ```
 
 
-## Investigating the Frequency of Redemption Count Data
+## Analysis - Examining the Frequency of Redemption Count Data{#sec-result2}
 
-@fig-Daily_Redemption_Histogram illustrates that for most days, the redemption count remains below 10,000. However, there are some days where the redemption count peaks at 20,234.
+@fig-Daily_Redemption_Histogram illustrates that for most days, the redemption count remains below 10,000. The 95 percentile of the redemption count is 16075.4. There are some days where the redemption count peaks at 20,234.
 
-For our resource allocation needs, utilizing monthly data would be sufficient to create an effective staffing schedule. Daily scheduling may not be as feasible or efficient, making a monthly approach more practical for our purposes. The monthly redemption distribution is analysed @sec-monred.
+For our resource allocation needs, utilizing monthly data would be sufficient to create an effective staffing schedule. Daily scheduling may not be as feasible or efficient, making a monthly approach more practical for our purposes. The monthly redemption distribution is analysed @sec-result3.
 
 
 ```{r}
@@ -237,15 +246,14 @@ ggplot(data, aes(x = daily_redemption_count)) +
   geom_vline(xintercept = percentile_95, color = "mediumpurple", linetype = "dashed", size = 1) # Add a dashed vertical line at the 95th percentile
 ```
 
+## Analysis - Exploring the Monthly Redemption Data{#sec-result3}
 
-@fig-Redemption_Over_Month illustrates the redemption counts for each month, with dividing lines in each bar indicating daily redemption counts and their cumulative total. The redemption counts are notably low during the winter months, while summer months exhibit significantly higher counts. Notably, in August 2023, the redemption count approached 350,000.
+@fig-Redemption_Over_Month illustrates the redemption counts for each month, with dividing lines in each bar indicating daily redemption counts and their cumulative total. The redemption counts are notably low during the winter months, while summer months exhibit significantly higher counts. Notably, in August 2023, the redemption count approached 350,000. 
 
-From July to September 2023 and from May to September 2024, the monthly redemption counts exceed 100,000. In contrast, from October 2023 to April 2024, the redemption counts fall below this threshold each month.
+From July to September 2023 and from May to September 2024, the monthly redemption counts exceed 100,000. In contrast, from October 2023 to April 2024, the redemption counts fall below this threshold.
 
-Given these observations, it would be prudent to design two distinct staffing schedules for the ferries: one for peak periods when redemption counts are high and another for off-peak periods when counts are lower. This approach enables more efficient staff allocation based on expected demand.
+Given these observations, it would be prudent to design two distinct staffing and departure schedules for the ferries: one for peak periods when redemption counts are high and another for off-peak periods when counts are lower. This approach enables more efficient staff and ferries allocation and based on expected demand.
 
-
-## Investigating the Monthly Redemption Data{sec-monred}
 
 ```{r}
 #| label: fig-Redemption_Over_Month
@@ -273,22 +281,21 @@ ggplot(data, aes(x = year_month, y = daily_redemption_count)) +
 ```
 
 
-# Discussion{#sec-discussion}
 
 
-## Impact of Pricing Strategy on Revenue Optimization {#sec-first-point}
+## Discussion - Impact of Pricing Strategy on Revenue Optimization {#sec-dis1}
 
 
 The high correlation and linear relationship between sales and redemption data in @sec-result1 suggest that the flat pricing model for ferry tickets has a significant impact. If the fare were adjusted to be lower during the off-peak season, it could potentially enhance revenue during the winter months. While this may result in some revenue loss during the summer, the overall impact might not be as detrimental due to the typically higher volume of sales during that period.
 
 
-## Efficient Staffing Solutions for Peak and Off-Peak Seasons
+## Discussion - Efficient Staffing Solutions for Peak and Off-Peak Seasons{#sec-dis2}
 
 Based on @fig-Daily_Redemption_Histogram, one measure that Toronto Islands ferries could implement is to integrate staff and departure schedules during peak seasons to prepare for large visitor volumes. For instance, having janitors on-call during busy periods would ensure that adequate cleaning services are available and shortening the time interval between departures when the number of visitors increases significantly.
 
 Additionally, it is essential to develop an on-call schedule for staff that aligns with peak and off-peak seasons. For example, in the winter months, preparing a full staff contingent to manage more than 20,000 visitors per day would be an inefficient use of resources. Instead, a more tailored approach would allow for better resource allocation based on anticipated demand.
 
-## Evaluation of Staffing and Departure Schedules in Relation to Visitor Demand
+## Discussion - Evaluation of Staffing and Departure Schedules in Relation to Visitor Demand{#sec-dis3}
 
 From @fig-Redemption_Over_Month, a noticeable difference in the height of the bars can be observed between May and September compared to the rest of the year. Upon closer examination of the graph, July and August exhibit significantly higher redemption counts compared to other summer months.
 
