@@ -1,12 +1,12 @@
 ---
-title: "Patterns of Toronto Islands Ferries Tickets Sales and Redemption and potential Solutions"
+title: "Toronto Island Ferry Tickets: Sales, Redemption Analysis, and Strategic Solutions"
 subtitle: ""
 author: 
   - Yun Chu
 thanks: "code and data supporting this analaysis can be found here: https://github.com/chuyun2024/Analyzing-Toronto-Islands-Ferry-Tickets-Sales-and-Redemption-Count-Data"
 date: 26 September 2024
 date-format: long
-abstract: "The paper firstly discussed the background of the dataset, then presented and analyzed the cleaned dataset. In the result section, the relationship between the sales and redemption data, the distribution of redemption count, and the trend of redemption count with respect to time is analyzed. The discussion section comes up with some suggestions to Toronto Islands ferries based on the findings and discuss the limilation of the analysis."
+abstract: "This paper presents a comprehensive analysis of the Toronto Islands ferry ticket sales and redemption dataset. The analysis begins with an overview of the dataset, followed by an examination of the cleaned data. In the results section, we explore the relationship between sales and redemption data, the distribution of redemption counts, and the monthly trends in redemption activity. Based on the findings, we offer recommendations to optimize ferry operations, focusing on pricing strategies, staffing allocations, and departure schedules. The paper concludes by discussing the limitations of the analysis and identifying potential areas for future improvement."
 format: pdf
 toc: true
 number-sections: true
@@ -60,20 +60,21 @@ A sample of the cleaned data (@tbl-cleaned_data) and a line plot (@fig-Sales_and
 # Read the cleaned sales and redemption data from a CSV file
 # The file path is relative to the current working directory.
 # show_col_types = FALSE suppresses the display of column type information in the output.
-data <- read_csv("../data/analysis_data/cleaned_data.csv", show_col_types = FALSE) 
+data <- read_csv("../data/analysis_data/cleaned_data.csv", show_col_types = FALSE)
 
 # Extract the first few rows of the data for a sample view
 # head(data) returns the first 6 rows of the dataset by default
-data2 <- head(data) 
+data2 <- head(data)
 
 # Create a formatted table to display the sample data
 # kable generates the table, with specified column names and alignment
 # 'align = "ccc"' aligns all three columns to the center
 # caption adds a descriptive title to the table
-kable(data2, 
-      col.names = c('Date', 'Sales', 'Redemption'), 
-      align = "ccc",  
-      caption = "Sample of Cleaned Sales and Redemption Data")
+kable(data2,
+  col.names = c("Date", "Sales", "Redemption"),
+  align = "ccc",
+  caption = "Sample of Cleaned Sales and Redemption Data"
+)
 ```
 
 ```{r, fig.width = 8, fig.height = 5}
@@ -82,16 +83,20 @@ kable(data2,
 #| echo: false
 
 # Create a line plot using ggplot2
-ggplot(data, aes(x = formatted_date)) +  # Define the data and aesthetic mappings; formatted_date on the x-axis
-  geom_line(aes(y = daily_sales_count, color = "Sales"), linewidth = 1, alpha = 0.7) +  # Add a line for daily sales count
-  geom_line(aes(y = daily_redemption_count, color = "Redemption"), linewidth = 1, alpha = 0.7) +  # Add a line for daily redemption count
-  labs(title = "Sales and Redemption Over Time",  # Add titles and labels to the plot
-       x = "Date",                                # Label for the x-axis
-       y = "Count") +                             # Label for the y-axis
-  scale_color_manual(name = "Legend",             # Customize the color scale for the legend
-                     values = c("Sales" = "#2b5b84", "Redemption" = "#98df8a")) +  # Assign specific colors to the lines
-  theme_minimal() +                               # Use a minimal theme for cleaner visuals
-  theme(plot.title = element_text(hjust = 0.5))  # Center the plot title horizontally
+ggplot(data, aes(x = formatted_date)) + # Define the data and aesthetic mappings; formatted_date on the x-axis
+  geom_line(aes(y = daily_sales_count, color = "Sales"), linewidth = 1, alpha = 0.7) + # Add a line for daily sales count
+  geom_line(aes(y = daily_redemption_count, color = "Redemption"), linewidth = 1, alpha = 0.7) + # Add a line for daily redemption count
+  labs(
+    title = "Sales and Redemption Over Time", # Add titles and labels to the plot
+    x = "Date", # Label for the x-axis
+    y = "Count"
+  ) + # Label for the y-axis
+  scale_color_manual(
+    name = "Legend", # Customize the color scale for the legend
+    values = c("Sales" = "#2b5b84", "Redemption" = "#98df8a")
+  ) + # Assign specific colors to the lines
+  theme_minimal() + # Use a minimal theme for cleaner visuals
+  theme(plot.title = element_text(hjust = 0.5)) # Center the plot title horizontally
 ```
 
 The sales and redemption data largely overlap, with significantly higher values in the summer compared to the winter months (@fig-Sales_and_Redemption_vs_Date).
@@ -116,7 +121,8 @@ summary_statistic <- data |>
     Min_Redemption = min(daily_redemption_count),
     Max_Redemption = max(daily_redemption_count),
     Mean_Redemption = mean(daily_redemption_count),
-    Std_Redemption = sd(daily_redemption_count))
+    Std_Redemption = sd(daily_redemption_count)
+  )
 
 # Create a new data frame for the desired table format
 summary_table <- data.frame(
@@ -130,9 +136,11 @@ summary_table <- data.frame(
 rownames(summary_table) <- c("Sales", "Redemption")
 
 # Display the summary table with row and column headings
-kable(summary_table, format = "latex", row.names = TRUE, col.names = c("Min", "Max", "Mean", "Standard Deviation"), 
-      caption = 'Summary Statistics for Sales and Redemption Count',
-      align = "ccccc") |>
+kable(summary_table,
+  format = "latex", row.names = TRUE, col.names = c("Min", "Max", "Mean", "Standard Deviation"),
+  caption = "Summary Statistics for Sales and Redemption Count",
+  align = "ccccc"
+) |>
   kable_styling(full_width = FALSE, position = "left")
 ```
 
@@ -155,11 +163,13 @@ To investigate the relationship between sales and redemption data, we first crea
 #| message: false
 
 # Create a scatter plot using ggplot2 to visualize the relationship between sales and redemption
-ggplot(data, aes(x = daily_sales_count, y = daily_redemption_count)) +  # Set the data and aesthetic mappings; daily sales on the x-axis and daily redemption on the y-axis
-  geom_point(alpha = 0.5, color = "#008080") +  # Add points to the plot to represent each observation
-  labs(title = "Scatter Plot of Sales vs Redemption",  # Add a title to the plot
-       x = "Ticket Sales Count",  # Label for the x-axis
-       y = "Ticket Redemption Count") + # Label for the y-axis
+ggplot(data, aes(x = daily_sales_count, y = daily_redemption_count)) + # Set the data and aesthetic mappings; daily sales on the x-axis and daily redemption on the y-axis
+  geom_point(alpha = 0.5, color = "#008080") + # Add points to the plot to represent each observation
+  labs(
+    title = "Scatter Plot of Sales vs Redemption", # Add a title to the plot
+    x = "Ticket Sales Count", # Label for the x-axis
+    y = "Ticket Redemption Count"
+  ) + # Label for the y-axis
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
@@ -176,22 +186,22 @@ In this paper, we will primarily focus on analyzing the redemption count data, a
 #| warning: false
 #| message: false
 # Perform linear regression to model the relationship between daily redemption count and daily sales count
-model <- lm(daily_redemption_count ~ daily_sales_count, data = data)  
+model <- lm(daily_redemption_count ~ daily_sales_count, data = data)
 
 # Extract the R-squared value from the summary of the linear model
-r_squared <- summary(model)$r.squared  
+r_squared <- summary(model)$r.squared
 
 # Calculate the correlation statistic between daily sales count and daily redemption count
-corr_stat <- cor(data$daily_sales_count, data$daily_redemption_count)  
+corr_stat <- cor(data$daily_sales_count, data$daily_redemption_count)
 
 # Create a summary table to display the R-squared and correlation statistics
-summary_table <- data.frame(  
-  statistic = c("R-Squared", "Correlation"),  # Names of the statistics being reported
-  value = c(r_squared, corr_stat)  # Corresponding values for the statistics
-)  
+summary_table <- data.frame(
+  statistic = c("R-Squared", "Correlation"), # Names of the statistics being reported
+  value = c(r_squared, corr_stat) # Corresponding values for the statistics
+)
 
 # Render the summary table using kable for better formatting, with specified column names and caption
-kable(summary_table, col.names = c("Statistics", "Value"), align = 'cc', caption = "R-squared and Correlation Statistic")
+kable(summary_table, col.names = c("Statistics", "Value"), align = "cc", caption = "R-squared and Correlation Statistic")
 ```
 
 
@@ -209,19 +219,22 @@ For our resource allocation needs, utilizing monthly data would be sufficient to
 #| warning: false
 #| message: false
 # Calculate the 95th percentile of daily redemption counts
-percentile_95 <- quantile(data$daily_redemption_count, 0.95)  
+percentile_95 <- quantile(data$daily_redemption_count, 0.95)
 
 # Create a histogram to visualize the distribution of daily redemption counts
-ggplot(data, aes(x = daily_redemption_count)) +  
-  geom_histogram(binwidth = 300, fill = "lightskyblue", color = "steelblue1") +  # Add histogram bars with specified binwidth and colors
-  labs(title = "Histogram of Daily Redemption Counts",  # Add a title for the histogram
-       x = "Daily Redemption Count",  # Label for the x-axis
-       y = "Frequency") +  # Label for the y-axis
-  theme(plot.title = element_text(hjust = 0.5)) +  # Center the plot title
-  annotate("text", x = percentile_95, y = 30, label = paste("95th Percentile:", round(percentile_95, 2)),  # Annotate the plot with the 95th percentile value
-           color = "mediumpurple", vjust = -0.5) +  # Set the color of the annotation and adjust vertical positioning
-  geom_vline(xintercept = percentile_95, color = "mediumpurple", linetype = "dashed", size = 1)  # Add a dashed vertical line at the 95th percentile
-
+ggplot(data, aes(x = daily_redemption_count)) +
+  geom_histogram(binwidth = 300, fill = "lightskyblue", color = "steelblue1") + # Add histogram bars with specified binwidth and colors
+  labs(
+    title = "Histogram of Daily Redemption Counts", # Add a title for the histogram
+    x = "Daily Redemption Count", # Label for the x-axis
+    y = "Frequency"
+  ) + # Label for the y-axis
+  theme(plot.title = element_text(hjust = 0.5)) + # Center the plot title
+  annotate("text",
+    x = percentile_95, y = 30, label = paste("95th Percentile:", round(percentile_95, 2)), # Annotate the plot with the 95th percentile value
+    color = "mediumpurple", vjust = -0.5
+  ) + # Set the color of the annotation and adjust vertical positioning
+  geom_vline(xintercept = percentile_95, color = "mediumpurple", linetype = "dashed", size = 1) # Add a dashed vertical line at the 95th percentile
 ```
 
 
@@ -241,19 +254,22 @@ Given these observations, it would be prudent to design two distinct staffing sc
 #| warning: false
 #| message: false
 # Create a new column in the data frame to represent the year and month from the formatted date
-data <- data %>%  
-  mutate(year_month = format(formatted_date, "%Y-%m"))  # Format the date to "YYYY-MM"
+data <- data %>%
+  mutate(year_month = format(formatted_date, "%Y-%m")) # Format the date to "YYYY-MM"
 
 # Create a bar plot to visualize redemption counts over each month
-ggplot(data, aes(x = year_month, y = daily_redemption_count)) +  
-  geom_bar(stat = "identity", fill = "grey93", color = "lightskyblue") +  # Create bars with specified fill and border colors
-  labs(title = "Redemption Over Month",  # Add a title for the plot
-       x = "Month",  # Label for the x-axis
-       y = "Redemption Count") +  # Label for the y-axis
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),  # Rotate x-axis text for better readability
-        plot.title = element_text(hjust = 0.5)) +  # Center the plot title
-  scale_y_continuous(labels = comma)  # Format the y-axis labels to include commas for thousands
-
+ggplot(data, aes(x = year_month, y = daily_redemption_count)) +
+  geom_bar(stat = "identity", fill = "grey93", color = "lightskyblue") + # Create bars with specified fill and border colors
+  labs(
+    title = "Redemption Over Month", # Add a title for the plot
+    x = "Month", # Label for the x-axis
+    y = "Redemption Count"
+  ) + # Label for the y-axis
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1), # Rotate x-axis text for better readability
+    plot.title = element_text(hjust = 0.5)
+  ) + # Center the plot title
+  scale_y_continuous(labels = comma) # Format the y-axis labels to include commas for thousands
 ```
 
 
@@ -268,17 +284,17 @@ The high correlation and linear relationship between sales and redemption data i
 
 ## Efficient Staffing Solutions for Peak and Off-Peak Seasons
 
-Based on @fig-Daily_Redemption_Histogram, one measure that Toronto Islands ferries could implement is to integrate staff schedules during peak seasons to prepare for large visitor volumes. For instance, having janitors on-call during busy periods would ensure that adequate cleaning services are available when the number of visitors increases significantly.
+Based on @fig-Daily_Redemption_Histogram, one measure that Toronto Islands ferries could implement is to integrate staff and departure schedules during peak seasons to prepare for large visitor volumes. For instance, having janitors on-call during busy periods would ensure that adequate cleaning services are available and shortening the time interval between departures when the number of visitors increases significantly.
 
-Additionally, it is essential to develop an on-call schedule that aligns with peak and off-peak seasons. For example, in the winter months, preparing a full staff contingent to manage more than 20,000 visitors per day would be an inefficient use of resources. Instead, a more tailored approach would allow for better resource allocation based on anticipated demand.
+Additionally, it is essential to develop an on-call schedule for staff that aligns with peak and off-peak seasons. For example, in the winter months, preparing a full staff contingent to manage more than 20,000 visitors per day would be an inefficient use of resources. Instead, a more tailored approach would allow for better resource allocation based on anticipated demand.
 
-## Evaluation of Staffing Schedules in Relation to Visitor Demand
+## Evaluation of Staffing and Departure Schedules in Relation to Visitor Demand
 
 From @fig-Redemption_Over_Month, a noticeable difference in the height of the bars can be observed between May and September compared to the rest of the year. Upon closer examination of the graph, July and August exhibit significantly higher redemption counts compared to other summer months.
 
 Currently, the Toronto Island ferries have adapted four different schedules: Summer (May 16th - September 15th), Fall (September 16th - October 14th), Winter (October 15th - an unspecified date in 2025), and Spring (an unspecified date - an unspecified date in 2025) [@TorontoIslandFerrySchedules]. However, without an analysis of the specific details of these schedules, it remains unclear whether the current allocation of resources is optimal based on the redemption data.
 
-Given the extremely high volume of visitors in July and August, adjusting the staffing schedules during these peak months may be more beneficial. This approach would align more closely with visitor demand and help avoid resource wastage during periods of lower activity.
+Given the extremely high volume of visitors in July and August, adjusting the staffing and departure schedules during these peak months may be more beneficial. This approach would align more closely with visitor demand and help avoid resource wastage during periods of lower activity.
 
 ## Weaknesses and Next Steps
 

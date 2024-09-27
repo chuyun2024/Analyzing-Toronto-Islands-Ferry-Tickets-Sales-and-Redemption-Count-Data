@@ -17,10 +17,11 @@ set.seed(200)
 start_date <- as.Date("2023-08-01")
 end_date <- as.Date("2024-08-31")
 
-#Set the number of Randoom dates
+# Set the number of Random dates
 number_of_dates <- 200
 
-data <- 
+#generate random dates from Poisson Distribution
+data <-
   tibble(
     dates = as.Date(
       runif(
