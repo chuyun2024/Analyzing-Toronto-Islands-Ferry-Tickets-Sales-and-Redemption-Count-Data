@@ -13,12 +13,32 @@ library(tidyverse)
 
 
 #### Test data ####
-data <- read_csv("data/raw_data/simulated.csv")
+data_simulated <- read_csv("data/raw_data/simulated.csv")
+data_actual <- read.csv("data/analysis_data/cleaned_data.csv")
 
 # Test for negative numbers
-data$number_of_sales |> min() <= 0
-data$number_of_redemptions |> min() <= 0
+tn1 <- data_simulated$number_of_sales |> min() <= 0
+tn2 <- data_simulated$number_of_redemptions |> min() <= 0
 
+tn3 <- data_actual$daily_sales_count |> min() <= 0
+tn4 <- data_actual$daily_redemption_count |> min() <= 0 
+
+if (!tn1 & !tn2 & !tn3 & !tn4) {
+  print("Negative number test passed.")
+} else {
+  print("Negative number test failed.")
+}
+  
 # Test for NAs
-all(is.na(data$number_of_sales))
-all(is.na(data$number_of_redemptions))
+
+tna1 <- all(is.na(data_simulated$number_of_sales))
+tna2 <- all(is.na(data_simulated$number_of_redemptions))
+
+tna3 <- all(is.na(data_actual$daily_sales_count))
+tna4 <- all(is.na(data_actual$daily_redemption_count))
+
+if (!tna1 & !tna2 & !tna3 & !tna4) {
+  print("NA test passed.")
+} else {
+  print("NA test failed.")
+}
